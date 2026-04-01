@@ -1,6 +1,6 @@
 # --- SOZLAMALAR ---
-$token = 8649684929:AAGUPmSFkh3tLV6OkveTTX3nuIc4rCNjs_A
-$chatId = 7068280080
+$token = "8649684929:AAGUPmSFkh3tLV6OkveTTX3nuIc4rCNjs_A"
+$chatId = "7068280080"
 # ------------------
 
 $username = $env:USERNAME
